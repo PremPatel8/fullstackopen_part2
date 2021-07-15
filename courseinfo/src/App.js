@@ -4,19 +4,15 @@ const Course = ({ courses }) => {
   return (
     <div>
       {courses.map((course) => {
-        return <ListItem course={course} key={course.id} />;
+        return (
+          <div key={course.id}>
+            <Header course={course} />
+            <Content course={course} />
+            <Total course={course} />
+          </div>
+        );
       })}
     </div>
-  );
-};
-
-const ListItem = ({ course }) => {
-  return (
-    <>
-      <Header course={course} />
-      <Content course={course} />
-      <Total course={course} />
-    </>
   );
 };
 
