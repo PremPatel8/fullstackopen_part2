@@ -1,14 +1,16 @@
 import React from "react";
 
-const Courses = ({ courses }) => {
+const Course = ({ courses }) => {
   return (
     <div>
-      {courses.map((course) => ( <Course course={course} key={course.id} /> ))}
+      {courses.map((course) => {
+        return <ListItem course={course} key={course.id} />;
+      })}
     </div>
   );
 };
 
-const Course = ({ course }) => {
+const ListItem = ({ course }) => {
   return (
     <>
       <Header course={course} />
@@ -100,7 +102,7 @@ const App = () => {
     },
   ];
 
-  return <Courses courses={courses} />;
+  return <Course courses={courses} />;
 };
 
 export default App;
