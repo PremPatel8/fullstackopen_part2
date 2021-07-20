@@ -9,24 +9,40 @@ const App = () => {
   const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
-    if (searchString) {
-      const API_URL = `https://restcountries.eu/rest/v2/name/${searchString}?fields=name;capital;population;languages;flag`;
-      axios.get(API_URL).then((response) => {
-        setCountries(response.data);
-      });
-    }
-  }, [searchString]);
+    const API_URL = "https://restcountries.eu/rest/v2/all";
+    axios.get(API_URL).then((response) => {
+      setCountries(response.data);
+    });
+  }, []);
 
   const setCountryName = (event) => {
     setSearchString(event.target.value);
   };
+
+  function filterCountries() {
+    if (searchString === "") {
+      return [];
+    } else {
+      let fCountries = countries.filter((country) =>
+        country.name.toLowerCase().includes(searchString.toLowerCase())
+      );
+
+      if (fCountries.length > 10) {
+        return [{ name: "Too many matches, specify another filter" }];
+      } else {
+        return fCountries;
+      }
+    }
+  }
+
+  const countriesToDisplay = filterCountries();
 
   return (
     <div>
       <div>
         <Searchbox searchString={searchString} handleChange={setCountryName} />{" "}
       </div>{" "}
-      <Response countries={countries} />
+      <Response countries={countriesToDisplay} />
     </div>
   );
 };
