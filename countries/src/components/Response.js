@@ -1,27 +1,24 @@
 import React from "react";
+import Countrydetails from "./Countrydetails";
 
-const Response = ({ countries }) => {
-  if (countries.length === 1 && countries[0].hasOwnProperty("flag")) {
-    return (
-      <div>
-        <h1>{countries[0].name}</h1>
-        <div>capital {countries[0].capital}</div>
-        <div>population {countries[0].population}</div>
-        <br></br>
-        <h2>languages</h2>
-        <ul>
-          {countries[0].languages.map((language) => (
-            <li key={language.name}>{language.name}</li>
-          ))}
-        </ul>
-        <img src={countries[0].flag} alt="country flag" width="100" />
-      </div>
-    );
+const Response = ({ countries, country, showCountryDetails, handleClick }) => {
+  // console.log("country = ", country);
+  // console.log("showCountryDetails = ", showCountryDetails);
+
+  if (showCountryDetails) {
+    return <Countrydetails country={country} />;
+  } else if (countries.length === 1 && countries[0].hasOwnProperty("flag")) {
+    return <Countrydetails country={countries[0]} />;
+  } else if (countries.length === 1 && !countries[0].hasOwnProperty("flag")) {
+    return <div key={countries[0].name}>{countries[0].name}</div>;
   } else {
     return (
       <div>
         {countries.map((country) => (
-          <div key={country.name}>{country.name}</div>
+          <div key={country.name}>
+            {country.name}{" "}
+            <button onClick={() => handleClick(country)}> show </button>
+          </div>
         ))}
       </div>
     );

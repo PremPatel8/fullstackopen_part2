@@ -4,9 +4,16 @@ import Searchbox from "./components/Searchbox";
 import Response from "./components/Response";
 
 const App = () => {
-  // const [country, setCountry] = useState();
   const [countries, setCountries] = useState([]);
   const [searchString, setSearchString] = useState("");
+
+  const [showCountryDetails, setShowCountryDetails] = useState(false);
+  const [country, setCountry] = useState([]);
+
+  const showCountry = (country) => {
+    setCountry(country);
+    setShowCountryDetails(!showCountryDetails);
+  };
 
   useEffect(() => {
     const API_URL = "https://restcountries.eu/rest/v2/all";
@@ -17,6 +24,9 @@ const App = () => {
 
   const setCountryName = (event) => {
     setSearchString(event.target.value);
+    if (showCountryDetails) {
+      setShowCountryDetails(!showCountryDetails);
+    }
   };
 
   function filterCountries() {
@@ -42,7 +52,12 @@ const App = () => {
       <div>
         <Searchbox searchString={searchString} handleChange={setCountryName} />{" "}
       </div>{" "}
-      <Response countries={countriesToDisplay} />
+      <Response
+        countries={countriesToDisplay}
+        country={country}
+        showCountryDetails={showCountryDetails}
+        handleClick={showCountry}
+      />
     </div>
   );
 };
