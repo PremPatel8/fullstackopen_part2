@@ -1,6 +1,7 @@
 import React from "react";
 
 const Countrydetails = ({ country }) => {
+  // console.log("inside Countrydetails country = ", country);
   return (
     <div>
       <h1>{country.name}</h1>

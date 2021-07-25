@@ -1,10 +1,13 @@
 import React from "react";
 
-const Searchbox = ({ searchString, handleChange }) => {
+const Searchbox = ({ filterText, onFilterTextChange }) => {
   return (
-    <p>
-      find countries <input value={searchString} onChange={handleChange} />
-    </p>
+    <form>
+      <p>
+        find countries{" "}
+        <input value={filterText} onChange={onFilterTextChange} />
+      </p>
+    </form>
   );
 };
 

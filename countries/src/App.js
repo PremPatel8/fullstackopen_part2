@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Searchbox from "./components/Searchbox";
-import Response from "./components/Response";
+import CountryTable from "./components/CountryTable";
 
 const App = () => {
   const [countries, setCountries] = useState([]);
-  const [searchString, setSearchString] = useState("");
-
-  const [showCountryDetails, setShowCountryDetails] = useState(false);
-  const [country, setCountry] = useState([]);
-
-  const showCountry = (country) => {
-    setCountry(country);
-    setShowCountryDetails(!showCountryDetails);
-  };
+  const [filterText, setFilterText] = useState("");
+  const [showCountryDetails, setShowCountryDetails] = useState("");
 
   useEffect(() => {
     const API_URL = "https://restcountries.eu/rest/v2/all";
@@ -22,41 +15,30 @@ const App = () => {
     });
   }, []);
 
-  const setCountryName = (event) => {
-    setSearchString(event.target.value);
-    if (showCountryDetails) {
-      setShowCountryDetails(!showCountryDetails);
-    }
+  const onShowCountryChange = (country) => {
+    // console.log("inside onShowCountryChange, country = ", country);
+
+    setShowCountryDetails(country);
   };
 
-  function filterCountries() {
-    if (searchString === "") {
-      return [];
-    } else {
-      let fCountries = countries.filter((country) =>
-        country.name.toLowerCase().includes(searchString.toLowerCase())
-      );
-
-      if (fCountries.length > 10) {
-        return [{ name: "Too many matches, specify another filter" }];
-      } else {
-        return fCountries;
-      }
-    }
-  }
-
-  const countriesToDisplay = filterCountries();
+  const handleFilterTextChange = (event) => {
+    setShowCountryDetails("");
+    setFilterText(event.target.value);
+  };
 
   return (
     <div>
       <div>
-        <Searchbox searchString={searchString} handleChange={setCountryName} />{" "}
+        <Searchbox
+          filterText={filterText}
+          onFilterTextChange={handleFilterTextChange}
+        />{" "}
       </div>{" "}
-      <Response
-        countries={countriesToDisplay}
-        country={country}
+      <CountryTable
+        countries={countries}
         showCountryDetails={showCountryDetails}
-        handleClick={showCountry}
+        handleClick={onShowCountryChange}
+        filterText={filterText}
       />
     </div>
   );
