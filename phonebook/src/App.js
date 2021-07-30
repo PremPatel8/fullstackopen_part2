@@ -11,7 +11,7 @@ const App = () => {
   const [filterString, setFilterString] = useState("");
 
   useEffect(() => {
-    contactService.getAll().then((initialContacts) => {
+    contactService.getAllContacts().then((initialContacts) => {
       setPersons(initialContacts);
     });
   }, []);
@@ -38,17 +38,43 @@ const App = () => {
   const addContact = (event) => {
     event.preventDefault();
 
-    const personObject = {
-      name: newName,
-      number: newNumber,
-    };
+    const contact = persons.find((n) => n.name === newName);
 
-    if (persons.some((x) => x.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+    if (contact) {
+      const result = window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one`
+      );
+
+      if (result) {
+        const changedContact = { ...contact, number: newNumber };
+
+        contactService
+          .updateContact(contact.id, changedContact)
+          .then((returnedContact) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== changedContact.id ? person : returnedContact
+              )
+            );
+          })
+          .catch((error) => {
+            alert(
+              `Could not Update number for ${changedContact.name} on server due to ${error}`
+            );
+          });
+        setNewName("");
+        setNewNumber("");
+      }
     } else {
-      contactService.create(personObject).then((returnedPerson) => {
+      const personObject = {
+        name: newName,
+        number: newNumber,
+      };
+
+      contactService.createContact(personObject).then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
       });
+
       setNewName("");
       setNewNumber("");
     }
@@ -66,7 +92,7 @@ const App = () => {
           setPersons(persons.filter((n) => n.id !== contactID));
         })
         .catch((error) => {
-          alert(`Could not Delete ${contact.name} from server due to ${error}`);
+          alert(`Could not Delete ${contact.name} on server due to ${error}`);
         });
     }
   };
