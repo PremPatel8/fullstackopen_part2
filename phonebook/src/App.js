@@ -49,6 +49,25 @@ const App = () => {
       contactService.create(personObject).then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
       });
+      setNewName("");
+      setNewNumber("");
+    }
+  };
+
+  const deleteselectedContact = (contactID) => {
+    const contact = persons.find((n) => n.id === contactID);
+
+    const result = window.confirm(`Delete ${contact.name} ?`);
+
+    if (result) {
+      contactService
+        .deleteContact(contactID)
+        .then(() => {
+          setPersons(persons.filter((n) => n.id !== contactID));
+        })
+        .catch((error) => {
+          alert(`Could not Delete ${contact.name} from server due to ${error}`);
+        });
     }
   };
 
@@ -58,6 +77,7 @@ const App = () => {
       <div>
         <Filter filterString={filterString} handleChange={filterNames} />
       </div>
+      <h2>add a new</h2>
       <InputForm
         handleSubmit={addContact}
         name={newName}
@@ -66,7 +86,10 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Phonenumbers filteredPersons={filteredPersons} />
+      <Phonenumbers
+        filteredPersons={filteredPersons}
+        handleDeleteContact={deleteselectedContact}
+      />
     </div>
   );
 };

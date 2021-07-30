@@ -19,21 +19,6 @@
       "name": "Mary Poppendieck",
       "number": "39-23-6423122",
       "id": 4
-    },
-    {
-      "name": "Prem Patel",
-      "number": "585-350-6925",
-      "id": 5
-    },
-    {
-      "name": "Jack Lee",
-      "number": "1234567890",
-      "id": 6
-    },
-    {
-      "name": "Django Freeman",
-      "number": "999-999-9999",
-      "id": 7
     }
   ]
 }
