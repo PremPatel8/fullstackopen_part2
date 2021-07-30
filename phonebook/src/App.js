@@ -10,6 +10,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filterString, setFilterString] = useState("");
 
+  const baseUrl = "http://localhost:3001/persons";
+
   useEffect(() => {
     console.log("effect");
     axios.get("http://localhost:3001/persons").then((response) => {
@@ -39,8 +41,9 @@ const App = () => {
         )
       : persons;
 
-  const addName = (event) => {
+  const addContact = (event) => {
     event.preventDefault();
+    
     const personObject = {
       name: newName,
       number: newNumber,
@@ -49,8 +52,17 @@ const App = () => {
     if (persons.some((x) => x.name === newName)) {
       alert(`${newName} is already added to phonebook`);
     } else {
-      setPersons(persons.concat(personObject));
+      // setPersons(persons.concat(personObject));
+      create(personObject).then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+      });
     }
+  };
+
+
+  const create = (newObject) => {
+    const request = axios.post(baseUrl, newObject);
+    return request.then((response) => response.data);
   };
 
   return (
@@ -60,7 +72,7 @@ const App = () => {
         <Filter filterString={filterString} handleChange={filterNames} />
       </div>
       <InputForm
-        handleSubmit={addName}
+        handleSubmit={addContact}
         name={newName}
         number={newNumber}
         handleNameChange={handleNameChange}
