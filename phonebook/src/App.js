@@ -11,6 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filterString, setFilterString] = useState("");
   const [notificationMessage, setNotificationMessage] = useState(null);
+  const [msgstyle, setMsgstyle] = useState(null);
 
   useEffect(() => {
     contactService.getAllContacts().then((initialContacts) => {
@@ -58,15 +59,20 @@ const App = () => {
                 person.id !== changedContact.id ? person : returnedContact
               )
             );
+            setMsgstyle("notificationStyle")
             setNotificationMessage(`Updated ${changedContact.name}'s number`);
             setTimeout(() => {
               setNotificationMessage(null);
             }, 5000);
           })
           .catch((error) => {
-            alert(
-              `Could not Update number for ${changedContact.name} on server due to ${error}`
+            setMsgstyle("errorStyle")
+            setNotificationMessage(
+              `Information of ${changedContact.name} has already been removed from server`
             );
+            setTimeout(() => {
+              setNotificationMessage(null);
+            }, 5000);
           });
         setNewName("");
         setNewNumber("");
@@ -81,7 +87,11 @@ const App = () => {
         setPersons(persons.concat(returnedPerson));
       });
 
+      setMsgstyle("notificationStyle")
       setNotificationMessage(`Added ${personObject.name}`);
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, 5000);
 
       setNewName("");
       setNewNumber("");
@@ -108,7 +118,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notificationMessage} />
+      <Notification message={notificationMessage} msgstyle={msgstyle} />
       <div>
         <Filter filterString={filterString} handleChange={filterNames} />
       </div>
