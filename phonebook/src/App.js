@@ -10,14 +10,20 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterString, setFilterString] = useState("");
-  const [notificationMessage, setNotificationMessage] = useState(null);
-  const [msgstyle, setMsgstyle] = useState(null);
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     contactService.getAllContacts().then((initialContacts) => {
       setPersons(initialContacts);
     });
   }, []);
+
+  const notify = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+  };
 
   const handleNameChange = (event) => {
     setNewName(event.target.value);
@@ -27,52 +33,37 @@ const App = () => {
     setNewNumber(event.target.value);
   };
 
-  const filterNames = (event) => {
+  const handleFilterStringChange = (event) => {
     setFilterString(event.target.value);
   };
-
-  const filteredPersons =
-    filterString !== ""
-      ? persons.filter((person) =>
-          person.name.toLowerCase().startsWith(filterString.toLowerCase())
-        )
-      : persons;
 
   const addContact = (event) => {
     event.preventDefault();
 
-    const contact = persons.find((n) => n.name === newName);
+    const existingContact = persons.find((n) => n.name === newName);
 
-    if (contact) {
+    if (existingContact) {
       const result = window.confirm(
-        `${newName} is already added to phonebook, replace the old number with a new one`
+        `${newName} is already added to phonebook, replace the old number with a new one?`
       );
 
       if (result) {
-        const changedContact = { ...contact, number: newNumber };
+        const changedContact = { ...existingContact, number: newNumber };
 
         contactService
-          .updateContact(contact.id, changedContact)
+          .updateContact(existingContact.id, changedContact)
           .then((returnedContact) => {
             setPersons(
               persons.map((person) =>
                 person.id !== changedContact.id ? person : returnedContact
               )
             );
-            setMsgstyle("notificationStyle")
-            setNotificationMessage(`Updated ${changedContact.name}'s number`);
-            setTimeout(() => {
-              setNotificationMessage(null);
-            }, 5000);
+            notify(`Updated ${changedContact.name}'s number`);
           })
           .catch((error) => {
-            setMsgstyle("errorStyle")
-            setNotificationMessage(
+            notify(
               `Information of ${changedContact.name} has already been removed from server`
             );
-            setTimeout(() => {
-              setNotificationMessage(null);
-            }, 5000);
           });
         setNewName("");
         setNewNumber("");
@@ -83,44 +74,56 @@ const App = () => {
         number: newNumber,
       };
 
-      contactService.createContact(personObject).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-      });
-
-      setMsgstyle("notificationStyle")
-      setNotificationMessage(`Added ${personObject.name}`);
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
-
+      contactService
+        .createContact(personObject)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          notify(`Added ${returnedPerson.name}`);
+        })
+        .catch((error) => {
+          console.log(error.response.data.error);
+          notify(`${error.response.data.error} `, "error");
+        });
       setNewName("");
       setNewNumber("");
     }
   };
 
   const deleteselectedContact = (contactID) => {
-    const contact = persons.find((n) => n.id === contactID);
+    const existingContact = persons.find((n) => n.id === contactID);
 
-    const result = window.confirm(`Delete ${contact.name} ?`);
+    const result = window.confirm(`Delete ${existingContact.name} ?`);
 
     if (result) {
       contactService
         .deleteContact(contactID)
-        .then(() => {
-          setPersons(persons.filter((n) => n.id !== contactID));
+        .then((response) => {
+          setPersons(persons.filter((p) => p.id !== contactID));
+          notify(`Deleted ${existingContact.name}`);
         })
         .catch((error) => {
-          alert(`Could not Delete ${contact.name} on server due to ${error}`);
+          setPersons(persons.filter((p) => p.id !== contactID));
+          notify(`${existingContact.name} had already been removed`, "error");
         });
     }
   };
 
+  const personsToShow =
+    filterString !== ""
+      ? persons.filter((p) =>
+          p.name.toLowerCase().startsWith(filterString.toLowerCase())
+        )
+      : persons;
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notificationMessage} msgstyle={msgstyle} />
+      <Notification notification={notification} />
       <div>
-        <Filter filterString={filterString} handleChange={filterNames} />
+        <Filter
+          filterString={filterString}
+          handleChange={handleFilterStringChange}
+        />
       </div>
       <h2>add a new</h2>
       <InputForm
@@ -132,7 +135,7 @@ const App = () => {
       />
       <h2>Numbers</h2>
       <Phonenumbers
-        filteredPersons={filteredPersons}
+        persons={personsToShow}
         handleDeleteContact={deleteselectedContact}
       />
     </div>

@@ -1,9 +1,9 @@
 import React from "react";
 
-const Phonenumbers = ({ filteredPersons, handleDeleteContact }) => {
+const Phonenumbers = ({ persons, handleDeleteContact }) => {
   return (
     <div>
-      {filteredPersons.map((person) => (
+      {persons.map((person) => (
         <div key={person.name}>
           <span>
             {person.name} {person.number}
